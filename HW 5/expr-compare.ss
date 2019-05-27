@@ -18,13 +18,6 @@
   )
 )
 
-(define (expr-compare-no-lambda x y)
-  (cond 
-    [(and (list? x) (list? y) (equal? (length x) (length y))) (process_possible_bind_no_lambda x y)]
-    [else (process_constant x y)]
-  )
-)
-
 (define (process_quote x y) (process_constant x y))
 (define (process_if x y) (process_list x y))
 
@@ -36,17 +29,6 @@
       [(or (equal? first_x 'if) (equal? first_y 'if)) (process_constant x y)]
       [(and (or (equal? first_x 'lambda) (equal? first_x my_lambda)) (or (equal? first_y 'lambda) (equal? first_y my_lambda))) (process_lambda x y)]
       [else (process_list x y)]
-    )
-  )
-)
-
-(define (process_possible_bind_no_lambda x y)
-  (let ([first_x (car x)] [first_y (car y)])
-    (cond
-      [(or (equal? first_x 'quote) (equal? first_y 'quote)) (process_quote x y)]
-      [(and (equal? first_x 'if) (equal? first_y 'if)) (process_if x y)]
-      [(or (equal? first_x 'if) (equal? first_y 'if)) (process_constant x y)]
-      [else (process_list-no-lambda x y)]
     )
   )
 )
@@ -130,13 +112,6 @@
   (cond
     [(or (empty? x) (empty? y)) '()]
     [else (cons (expr-compare (car x) (car y)) (process_list (cdr x) (cdr y)))]
-  )
-)
-
-(define (process_list-no-lambda x y)
-  (cond
-    [(or (empty? x) (empty? y)) '()]
-    [else (cons (expr-compare-no-lambda (car x) (car y)) (process_list-no-lambda (cdr x) (cdr y)))]
   )
 )
 
