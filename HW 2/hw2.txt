@@ -1,0 +1,30 @@
+I decided to create my make_parser function in terms of my make_matcher function. After designing make_matcher, 
+I figured that it was widely applicable to the make_parser, in that using an acceptor that only accepted the 
+empty list [] would effectively check to make sure the entire fragment was parsed. This completed the functionality
+for returning None in the case that the fragment could not be fully matched. I essentially used the same code as 
+make_matcher, but modified it so that it worked for the purposed of make_parser. My acceptor discussed above accepted
+2 arguments, the fragment and also my parse_tree that I built while matching the expression. If the fragment was empty,
+the acceptor would return Some parse_tree. Otherwise, it would return None. 
+
+Deriving the parse_tree was simply appending to the parse_tree list (the second element of the parse_tree tuple) whenever
+there was a terminal symbol, but handling nonterminals was a little more complicated. I had to make use of another argument
+throughout my mutually recursive functions called outer_parse_tree. I used this to pass in the parse_tree that the nonterminal
+was to be added to the list of, and passed in a new Node with the nonterminal being the first element of the tuple whenever I 
+encountered a new nonterminal symbol. I also had to add a new matching statement to the condition where I called the acceptor
+to append the parse_tree to the outer parse_tree whenever the outer_parse_tree wasn't None. As a result, when I made the recursive
+call to match the nonterminal, I had to pass the current parse_tree as Some parse_tree, and in the overall outer call of the 
+entire parsing function, I passed in None for the outer tree and a Node with the start symbol as the parse_tree.
+
+As a result, my mutually recursive functions would either return None, or Some parse_tree, and so I just made a call to the 
+modified functions from make_matcher and that returned what the specifications required. However, I am positive that my 
+implementation does have weaknesses. In particular, I know the implementation cannot function on ambiguous grammars or 
+grammars that have loops in the list of nonterminal mappings. If this were the case, my matcher and parser would simply continue
+down this DFS path to an infinite loop, and never return or be able to truly match anything. An example would be the following.
+
+(Expr, function |
+	| Expr -> [[N Expr; T "Terminal"];
+				[T "Terminal"]])
+
+The fragment ["Terminal"] should be able to be matched using this grammar, but instead the implementation will keep recursing
+over and over again on the Expr nonterminal and never get to try the second rule. In order to fix this weakness, some more measures
+would need to be taken in the code. 

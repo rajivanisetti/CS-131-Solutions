@@ -1,0 +1,42 @@
+Set Functions 
+
+My implementations for the set functions were pretty intuitive. For the most part, they simply involved matching
+the list with either the empty list or the hd::tl list representation, and then evaluating the hd through some 
+means depending on the function and then recursing on the tail. 
+
+For example, for the set_intersection function, I simply iterated through the list (a), checked if the list matched
+with [], in which case I returned [], and if not I matched the list with hd::tl, and checked if the hd was in the 
+list (b). If so, then I returned the hd concatenated with the recursion on the tail tl. All of the functions followed
+this same sort of pattern. 
+
+
+
+
+Computed Fixed Point Function
+
+For this function, I simply checked if the supplied (eq) function was true for the inputs x and (f x). If so,
+then I returned x. If not, then I recursed with the same (eq) and (f) functions, but replaced x with (f x). This
+was a one line solution, but it is important to note that if the fixed point does not exist relative to the start 
+point x, then this solution will very likely loop forever.
+
+
+
+
+Filter Reachable Function
+
+In order to write this function, I first used a function to return all of the reachable nonterminal symbols in a list,
+but it truly represented a set as in the previous portion of this homework. To do this, I iterated through the rules and 
+kept as a parameter this list of reachable nonterminal symbols (starting with only the start symbol), and if the LHS of each
+rule was a reachable then I would add all of the nonterminal symbols of the RHS (after filtering out terminal symbols using 
+another helper function) to the set and recurse on the remaining rules. If the LHS of the rule in question was not reachable, 
+then I would simply recurse on the remaining rules without adding to the current reachable nonterminal symbols list. 
+
+It is important to note that the ordering of the rules is arbitrary, and so multiple passes may be necessary to actually retrieve
+all nonterminal symbols. Because of this, I wrote a wrapper function that would call my previous function twice, once with the 
+given start node as the only item in the reachable nonterminal symbols list and then with the result of the previous call as the 
+list in the second call. After this, I saw if the result was stagnant, or rather if the returned sets of each call were equivalent.
+This made the previous equal_sets function useful for my implementation. If they were equal, then another pass was not necessary. However,
+if they were different then I recalled the overall function with the latest set, as we may have skipped over reachable nonterminal symbols.
+
+Finally, with the list of reachable nonterminal symbols. I simply filtered the RHS of the original grammar by checking membership of the 
+LHS of each rule in the reachable nonterminal symbols list, and returned the result, preceded by the original start symbol.
